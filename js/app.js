@@ -59,7 +59,8 @@ Player.prototype.handleInput = function(input){  //input
 }
 
 Player.prototype.select = function(input){  //list of possible character sprites;
-    var sprites = ['images/char-cat-girl.png','images/enemy-bug.png','images/char-boy.png'];
+    var sprites = ['images/char-boy.png', 'images/char-horn-girl.png',
+    'images/char-pink-girl.png','images/char-cat-girl.png','images/char-princess-girl.png'];
     var slst = sprites.length - 1; //variables used to cycle through list
     var i = this.playerChoice;    
     switch(input){
