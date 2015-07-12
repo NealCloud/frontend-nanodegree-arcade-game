@@ -26,7 +26,7 @@ var Engine = (function(global) {
         lastTime;
 
     canvas.width = 505;
-    canvas.height = 606;
+    canvas.height = 626;
     doc.body.appendChild(canvas);
 
     /* This function serves as the kickoff point for the game loop itself
@@ -132,6 +132,7 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
+                //ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
@@ -160,7 +161,16 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "25px Arial";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "black";
+        ctx.fillText("Score: 0", canvas.width/2, 40);
+        ctx.fillText("Select player with Right/Left and Up to Start", canvas.width/2, 610);
+        ctx.lineWidth = 3;
+        //ctx.strokeStyle = "black";
+        //ctx.strokeText("Select player with Right/Left and Up to Start", canvas.width/2, 40);
+        //player.select(input)
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -185,4 +195,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    global.canvas= canvas;
 })(this);
