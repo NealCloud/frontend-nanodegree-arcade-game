@@ -1,23 +1,29 @@
 
+var talk = false;
+var message = "";
 var Enemy = function(x,y,speed) {
     this.x = x;             //enemy cordinates given
     this.y = y;
     this.s = speed;         //variable speed added
     this.sprite = 'images/enemy-bug.png';
-    allEnemies.push(this); //push instance to a list
+    allEnemies.push(this); //push this enemy into enemy list
 }
 
 Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter (ok good to know)
+        //move bug right or reset him to other side
+        //TODO: make reset prototype that randomizes bug stats
+        this.x += this.x > 600 ? -800:(this.s * dt);
+        //collision check
+        this.collision();
+}
 
-        if(this.x > 600){       //check if bug has left the x boundary
-            this.x = -200;      //reset bug to left side of screen
-        }
-        else{this.x += (this.s * dt);}   //move bug by speed * dt value
-
-    if (this.x >= player.x - 10 && this.x <= player.x + 10
-       && this.y >= player.y - 10 && this.y <= player.y + 10){
-            player.death(); // activate death if player is within bug length
+Enemy.prototype.collision = function(){
+    //cleaner code with Math.abs much better than my 4 && range checker
+    var collide = Math.abs(player.x - this.x)
+    if(collide < 25 && player.y === this.y){
+        player.death();
+        player.miss();
     }
 }
 
@@ -25,20 +31,24 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);  //draws bugs every frame
 }
 
-var Player = function(x,y){  //player class
+var Player = function(x,y,life){  //player class
     this.x = x; //starting coordinates
     this.y = y;
-    this.died = "Good";
-    this.start = false;// to initiate start
-    this.score = 0;
-    this.playerChoice = 3;  //to switch character
+    this.died = ""; //ending message
+    this.start = false;// Start Screen Toggle
+    this.score = 0; //starting score
+    this.life = 3;  //starting lives
+    this.playerChoice = life || 3;  //Starting character
     this.sprite = 'images/char-boy.png'; //starting charcter choice
 }
 
+Player.prototype.miss = function(){
+    message = "yolo";
+}
+
 Player.prototype.update = function(dt,x,y){  //update player function
-     if(this.y <= 50){  //checks if you won crossing y boundary
+     if(this.y <= 0){  //checks if you won crossing y boundary
         this.y = 0;
-        console.log("u win");
         this.died = "You made it! "
         this.score += 10;
         this.reset();
@@ -48,6 +58,8 @@ Player.prototype.update = function(dt,x,y){  //update player function
 
 Player.prototype.render = function(){  //keeps drawing player
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+
+    ctx.fillText(message, this.x, this.y);
 }
 Player.prototype.death = function(){
     console.log("you died"); //death scene
@@ -76,6 +88,14 @@ Player.prototype.handleInput = function(input){  //input
     }
 }
 
+Player.prototype.bugout = function(){ //creates a random enemy instance
+    var bugY = [50,100,150,200,300,350]; //6 available lanes
+    var y = bugY[Math.floor(Math.random()* bugY.length)];
+    var s = Math.floor(Math.random()* 300) + 110;
+    var bugger = new Enemy(0, y, s);
+    console.log(s);
+}
+
 Player.prototype.select = function(input){  //list of possible character sprites;
     var sprites = ['images/char-boy.png', 'images/char-horn-girl.png',
     'images/char-pink-girl.png','images/char-cat-girl.png','images/char-princess-girl.png'];
@@ -102,7 +122,7 @@ Player.prototype.select = function(input){  //list of possible character sprites
 Player.prototype.move = function(input){ //move buttons
     switch(input){
         case "up":
-            this.y -= this.y >= 50 ? 50 : 0;
+            this.y -= this.y >= 0 ? 50 : 0;
             break;
         case "down":
             this.y += this.y <= 350 ? 50 : 0;
@@ -122,13 +142,6 @@ var ScoreBoard = function (){
     this.score = 0;
     this.character = 0;
 }
-Player.prototype.bugout = function(){
-    var bugY = [50,100,150,200,300,350];
-    var y = bugY[Math.floor(Math.random()* bugY.length)];
-    var s = Math.floor(Math.random()* 300) + 110;
-    var bugger = new Enemy(0, y, s);
-    console.log(s);
-}
 
 ScoreBoard.prototype.clear = function(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -138,6 +151,7 @@ ScoreBoard.prototype.display = function(){
      ctx.fillText("Get to the Water!   Score: " + player.score, canvas.width/2, 40);
 
 }
+
 var infoMain = new ScoreBoard();
 var allEnemies = [];  //create list for enemies
 var player = new Player(200,400); //create a player with starting coords
